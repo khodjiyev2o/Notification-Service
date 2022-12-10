@@ -52,7 +52,7 @@ async def patch_user(user: UserAlterSchema, db_user: User = Depends(get_user)) -
 
 @user_router.delete('/delete')
 async def delete_user(user_id: int,user: User = Depends(get_user)) -> HTTPException:
-    if user.admin:
+    if user.admin or user.id == user_id:
         user = await UserCRUD(user=user).delete_user(id=user_id)
         return user
     raise HTTPException(403,f"This user is not autharized to delete a user")

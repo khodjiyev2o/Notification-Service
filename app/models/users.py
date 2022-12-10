@@ -9,7 +9,10 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
-    description = Column(String)
+    phone_number = Column(Integer)
+    operator_code = Column(Integer)
+    #tag = Column
+    time_zone = Column(String)
     password = Column(String)
     admin = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

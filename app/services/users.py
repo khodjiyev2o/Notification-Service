@@ -30,10 +30,20 @@ class UserCRUD:
         if db_user:
             raise HTTPException(404, 'username or email already in use')
         else:
-            new_user = User(username=user.username, email=user.email, password=sha256.hash(user.password1), description=user.description)
+            new_user = User(username=user.username,
+                email=user.email,
+                password=sha256.hash(user.password1),
+                phone_number=user.phone_number,
+                operator_code=user.operator_code,
+                time_zone=user.time_zone)
             self.session.add(new_user)
             await self.session.commit()
-            return UserSchema(id=new_user.id, username=new_user.username, email=new_user.email, description=new_user.description)
+            return UserSchema(id=new_user.id,
+                username=new_user.username,
+                email=new_user.email,
+                phone_number=new_user.phone_number,
+                operator_code=new_user.operator_code,
+                time_zone=new_user.time_zone)
 
 
 
@@ -52,25 +62,40 @@ class UserCRUD:
     async def patch_user(self, user: UserAlterSchema) -> UserSchema:
         if user.username:
             self.user.username = user.username
-        if user.description:
-            self.user.description = user.description
+        if user.time_zone:
+            self.user.time_zone = user.time_zone
         if user.password:
             self.user.password = sha256.hash(user.password)
+        if user.operator_code:
+            self.user.operator_code = user.operator_code
+        if user.phone_number:
+            self.user.phone_number = user.phone_number
         await self.session.commit()
-        return UserSchema(id=self.user.id, username=self.user.username, email=self.user.email, description=self.user.description)
+        return UserSchema(id=self.user.id,
+            username=self.user.username,
+            email=self.user.email, 
+            phone_number=self.user.phone_number,
+            operator_code=self.user.operator_code,
+            time_zone=self.user.time_zone)
 
 
     async def get_users(self, page: int) -> list[UserSchema]:
         params = Params(page=page, size=10)
         users = await paginate(self.session, select(User), params=params)
-        return [UserSchema(id=user.id, username=user.username, email=user.email, description=user.description,admin=user.admin) for user in users.items]
+        return [UserSchema(id=user.id, username=user.username, email=user.email, phone_number=user.phone_number,operator_code=user.operator_code,time_zone=user.time_zone,admin=user.admin) for user in users.items]
 
 
 
     async def get_user(self, id: int) -> UserSchema:
         user = await self.session.get(User, id)
         if user:
-            return UserSchema(id=user.id, username=user.username, email=user.email, description=user.description,admin=user.admin)
+            return UserSchema(id=user.id,
+                username=user.username,
+                email=user.email, 
+                phone_number=user.phone_number,
+                operator_code=user.operator_code,
+                time_zone=user.time_zone,
+                admin=user.admin)
         raise HTTPException(404, 'user not found')
 
 
@@ -100,7 +125,9 @@ class UserCRUD:
             return UserSchema(id=user.id,
                 username=user.username,
                 email=user.email,
-                description=user.description,
+                phone_number=user.phone_number,
+                operator_code=user.operator_code,
+                time_zone=user.time_zone,
                 admin=user.admin)
 
     async def delete_admin(self,user_id) -> UserSchema:
@@ -113,7 +140,9 @@ class UserCRUD:
         return UserSchema(id=user.id,
             username=user.username,
             email=user.email,
-            description=user.description,
+            phone_number=user.phone_number,
+            operator_code=user.operator_code,
+            time_zone=user.time_zone,
             admin=user.admin)
 
     async def create_new_admin_user(self,user: UserAdminShema) -> UserSchema:
@@ -122,10 +151,16 @@ class UserCRUD:
         if db_user:
             raise HTTPException(404, 'username or email already in use')
         else:
-            new_user = User(username=user.username, email=user.email, password=sha256.hash(user.password1), description=user.description, admin=user.admin)
+            new_user = User(username=user.username, email=user.email, password=sha256.hash(user.password1), phone_number=user.phone_number, operator_code=user.operator_code,time_zone=user.time_zone, admin=user.admin)
             self.session.add(new_user)
             await self.session.commit()
-            return UserSchema(id=new_user.id, username=new_user.username, email=new_user.email, description=new_user.description, admin=new_user.admin)
+            return UserSchema(id=new_user.id,
+                username=new_user.username,
+                email=new_user.email, 
+                phone_number=user.phone_number,
+                operator_code=user.operator_code,
+                time_zone=user.time_zone,
+                admin=new_user.admin)
 
 
 async def get_user(session: AsyncSession = Depends(get_session), Token: str = Header()) -> User:
